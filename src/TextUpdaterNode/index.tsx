@@ -4,30 +4,32 @@ import { Node, NodeProps } from 'reactflow';
 import { useNodeId } from 'reactflow';
 
 import './index.css'
-const handleStyle = { left: 10 };
+const handleStyle = { top: 10 };
 
   
 function TextUpdaterNode({data, isConnectable }:any) {
     const nodeId = useNodeId();
     const [text, setText] = useState("")
-
     const reactFlowInstance = useReactFlow();
+    const [currentNode, setCurrentNode] = useState<any>()
     
     useEffect(() => {
-      
-      if (nodeId){
+    
+      if(nodeId){
         const selectedNode = reactFlowInstance.getNode(nodeId)
+        setCurrentNode(selectedNode)
         if (selectedNode && selectedNode.data.data.text){
           console.log(selectedNode.data.data.text)
           setText(selectedNode.data.data.text)
         }
-        
       }
+        
       return () => {
         
       }
     }, [nodeId, reactFlowInstance])
     
+    console.log(currentNode)
   const onChange = useCallback((evt:any) => {
     // console.log(evt.target.value);
     reactFlowInstance.setNodes((nds) =>
@@ -57,20 +59,22 @@ function TextUpdaterNode({data, isConnectable }:any) {
 
   return (
     <div className="text-updater-node">
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+      <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
       <div>
         <label htmlFor="text">Text:</label>
         <input id="text" name="text" onChange={onChange} className="nodrag" value={text} />
-        <button onClick={onDelete}>Delete</button>
+        {/* <button onClick={onDelete}>Delete</button> */}
       </div>
+      
       <Handle
         type="source"
-        position={Position.Bottom}
-        id="a"
+        position={Position.Right}
+        id="true"
         style={handleStyle}
         isConnectable={isConnectable}
+        content='true'
       />
-      <Handle type="source" position={Position.Bottom} id="b" isConnectable={isConnectable} />
+      <Handle type="source" position={Position.Right} id="false" isConnectable={isConnectable} />
     </div>
   );
 }
