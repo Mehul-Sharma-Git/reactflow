@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useId } from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     addEdge,
@@ -29,18 +29,33 @@ import ConnectionLine from '../CustomConnectionLine/dottedAnimated';
 
 import EditableEdgeLine from '../CustomConnectionLine/editableEdgeLine'
 import SubFlowNode from '../SubFlowNode';
-import getNewNode from '../CreateNewNode';
+import GetNewNode from '../CreateNewNode';
 
 type CustomNode = Node & {
     output? :any
 }
+
 const initialNodes: CustomNode[] = [
     {
-        id: '1',
+        id: 'initialNode',
         type: 'input',
-        data: { label: 'input node', data: {} },
-        output:{},
-        position: { x: 250, y: 5 },
+        data:{label:'initial node'},
+        
+        position: { x: 250, y: -300 },
+    },
+    {
+        id: 'SuccessFinalNode',
+        type: 'output',
+        data:{label:'success node'},
+        
+        position: { x: 100, y: 300 },
+    },
+    {
+        id: 'FailureFinalNode',
+        type: 'output',
+        data:{label:'failure node'},
+        
+        position: { x: 400, y: 300 },
     },
 ];
 
@@ -233,10 +248,10 @@ const DnDFlow = () => {
                 y: event.clientY - reactFlowBounds.top,
             });
            
-            const newNode = getNewNode(type, position, nodes)
+            const newNode = GetNewNode(type, position, nodes)
             
 
-            setNodes((nds) => nds.concat(newNode));
+            setNodes((nds) => nds.concat(newNode()));
         },
         [reactFlowInstanceState]
     );

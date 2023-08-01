@@ -14,7 +14,8 @@ import ReactFlow, {
     Node,
     Edge
 } from 'reactflow';
-import CustomNode from '../EasyConnectNode';
+import { v4 as uuidv4 } from 'uuid';
+// import CustomNode from '../EasyConnectNode';
 
 type CustomNode = Node & {
     output? :any
@@ -27,58 +28,61 @@ type CustomNode = Node & {
 //     data: any,
 //     parentNode?: any
 // }
-const getNewNode =(type:any, position:any, nodes: CustomNode[]): CustomNode=>{
-
-    
-    let id = 0;
-const getId = () => `dndnode_${id++}`;
 let newNode: CustomNode
-    switch (type){
-        case 'parentGroup':
-            newNode= {
-                id: getId(),
-                type,
-                position,
-                style: {
-                    width: 170,
-                    height: 140
-                },
-                output: {
-                    id:'output',
-                    displayName: 'output'
-                },
-                data: { label: `${type} node`, data: {} },
-            };
-            const isDropOnParentNode = nodes.find((node: any) => {
-                if (node.type === 'parentGroup' && newNode.position.x >= node.position.x && newNode.position.x <= node.position.x + node.width && newNode.position.y >= node.position.y && newNode.position.y <= node.position.y + node.height) {
-                    newNode.position.x = newNode.position.x - node.position.x
-                    newNode.position.y = newNode.position.y - node.position.y
-                    return node
-                }
-    
-    
-            })
-    
-    
-            newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined
-            return newNode
-            default :
-                newNode = {
-                    id: getId(),
+const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
+
+    const getNode = () =>{
+
+        switch (type){
+            case 'parentGroup':
+                newNode= {
+                    id: uuidv4(),
                     type,
                     position,
-                    output:[
-                        { id:'true',
-                    displayName:'True'},
-                    { id:'false',
-                    displayName:'False'},
-                    ],
+                    style: {
+                        width: 170,
+                        height: 140
+                    },
+                    output: {
+                        id:'output',
+                        displayName: 'output'
+                    },
                     data: { label: `${type} node`, data: {} },
                 };
+                const isDropOnParentNode = nodes.find((node: any) => {
+                    if (node.type === 'parentGroup' && newNode.position.x >= node.position.x && newNode.position.x <= node.position.x + node.width && newNode.position.y >= node.position.y && newNode.position.y <= node.position.y + node.height) {
+                        newNode.position.x = newNode.position.x - node.position.x
+                        newNode.position.y = newNode.position.y - node.position.y
+                        return node
+                    }
+        
+        
+                })
+        
+        
+                newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined
                 return newNode
-                
+                default :
+                    newNode = {
+                        id: uuidv4(),
+                        type,
+                        position,
+                        output:[
+                            { id:'true',
+                        displayName:'True'},
+                        { id:'false',
+                        displayName:'False'},
+                        ],
+                        data: { label: `${type} node`, data: {} },
+                    };
+                    return newNode
+                    
+        }
+    
     }
 
+    return getNode
+    
 }
 
-export default getNewNode
+export default GetNewNode
