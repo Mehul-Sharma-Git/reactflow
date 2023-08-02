@@ -31,8 +31,6 @@ type CustomNode = Node & {
 let newNode: CustomNode
 const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
 
-    const getNode = () =>{
-
         switch (type){
             case 'parentGroup':
                 newNode= {
@@ -43,10 +41,10 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                         width: 170,
                         height: 140
                     },
-                    output: {
+                    output: [{
                         id:'output',
                         displayName: 'output'
-                    },
+                    }],
                     data: { label: `${type} node`, data: {} },
                 };
                 const isDropOnParentNode = nodes.find((node: any) => {
@@ -68,20 +66,19 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                         type,
                         position,
                         output:[
-                            { id:'true',
-                        displayName:'True'},
-                        { id:'false',
-                        displayName:'False'},
+                            { 
+                                id:'true',
+                                displayName:'True'
+                            },
+                            {   id:'false',
+                                displayName:'False'
+                            }
                         ],
                         data: { label: `${type} node`, data: {} },
                     };
                     return newNode
                     
         }
-    
-    }
-
-    return getNode
     
 }
 

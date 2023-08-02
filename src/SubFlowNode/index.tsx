@@ -63,7 +63,7 @@ function SubFlowNode({data, isConnectable }:any) {
         {/* <input id="text" name="text" onChange={onChange} className="nodrag" value={text} />
         <button onClick={onDelete}>Delete</button> */}
       </div>
-      <Handle type="source" position={Position.Bottom} id="b" isConnectable={isConnectable} />
+      <Handle type="source" position={Position.Bottom} id="output" isConnectable={isConnectable} />
     </div>
   );
 }

@@ -32,29 +32,29 @@ import SubFlowNode from '../SubFlowNode';
 import GetNewNode from '../CreateNewNode';
 
 type CustomNode = Node & {
-    output? :any
+    output?: any
 }
 
 const initialNodes: CustomNode[] = [
     {
         id: 'initialNode',
         type: 'input',
-        data:{label:'initial node'},
-        
+        data: { label: 'initial node' },
+
         position: { x: 250, y: -300 },
     },
     {
         id: 'SuccessFinalNode',
         type: 'output',
-        data:{label:'success node'},
-        
+        data: { label: 'success node' },
+
         position: { x: 100, y: 300 },
     },
     {
         id: 'FailureFinalNode',
         type: 'output',
-        data:{label:'failure node'},
-        
+        data: { label: 'failure node' },
+
         position: { x: 400, y: 300 },
     },
 ];
@@ -89,16 +89,63 @@ const nodeTypes = {
 //     stroke: 'black',
 // };
 
+type Tree ={
+    "entryNodeId": string,
+    "nodes": any,
+    "staticNodes": {
+        "successFinalNode": { "position": { x: Number, y: Number } },
+        "failureFinalNode": { "position": { x: Number, y: Number } },
+        "initialNode": { "position": { x: Number, y: Number } }
+    },
+}
+const initialTree: Tree = {
+    "entryNodeId": "",
+    "nodes": {},
+    "staticNodes": {
+        "successFinalNode": { "position": { x: 100, y: 300 } },
+        "failureFinalNode": { "position": { x: 400, y: 300 } },
+        "initialNode": { "position": { x: 250, y: -300 } }
+    },
+
+}
+
+const CustomNodeToTreeNode = (node:CustomNode)=>{
+
+    return {
+        id:node.id,
+        connections: node.output.map((output:any)=>{return {[output.id]:"",}}),
+        type: node.type,
+
+    }
+}
 const DnDFlow = () => {
     const reactFlowWrapper: any = useRef(null);
     const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
     const [edges, setEdges] = useState<Edge[]>([]);
-
+    const [tree, setTree] = useState<any>(initialTree)
     const onNodesChange = useCallback(
         (changes: any) => {
-            console.log("node changes")
-            console.log(changes)
+            
             setNodes((nds) => applyNodeChanges(changes, nds))
+            
+            if (changes[0].type === 'position' && changes[0].dragging === true && (changes[0].id === "successFinalNode" || changes[0].id === "failureFinalNode" || changes[0].id === "initialNode")) {
+                
+                setTree((tr: Tree) => ({ ...tr, staticNodes: { ...tr.staticNodes, [changes[0].id]: { position: { x: changes[0].position.x, y: changes[0].position.y } } } }))
+            } else if(changes[0].type==='remove'){
+                const removeID = changes[0].id
+                setTree((tr:Tree)=>{
+
+                    const copy = {...tr}
+
+                    delete copy.nodes[removeID]
+
+                    for (const eachNode in copy.nodes){
+                        copy.nodes[eachNode].connections.map((elem:any)=>{Object.keys(elem).map((key:any)=>{return elem[key] = elem[key]===removeID?"":elem[key]}); return elem})
+                    }
+                    return copy
+                })
+
+            }
         },
         []
     );
@@ -106,7 +153,8 @@ const DnDFlow = () => {
         (changes: any) => {
             console.log("edge changes")
             console.log(changes)
-            setEdges((eds) => applyEdgeChanges(changes, eds))
+            setEdges((eds: Edge<any>[]) => applyEdgeChanges(changes, eds))
+            
         },
         []
     );
@@ -115,7 +163,7 @@ const DnDFlow = () => {
 
     const { setViewport } = useReactFlow();
     // const reactFlowInstance = useReactFlow()
-    
+
     const edgeUpdateSuccessful = useRef(true);
 
     const [nodeName, setNodeName] = useState('Node 1');
@@ -130,7 +178,7 @@ const DnDFlow = () => {
         console.log(oldEdge)
         console.log(newConnection)
         edgeUpdateSuccessful.current = true;
-        setEdges((els) => updateEdge(oldEdge, newConnection, els));
+        setEdges((els: Edge[]) => updateEdge(oldEdge, newConnection, els));
     }, []);
 
     const onEdgeUpdateEnd = useCallback((_: any, edge: any) => {
@@ -138,8 +186,9 @@ const DnDFlow = () => {
         console.log(_)
         console.log(edge)
         if (!edgeUpdateSuccessful.current) {
-            setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+            setEdges((eds: any[]) => eds.filter((e: { id: any; }) => e.id !== edge.id));
         }
+        setTree((tr:Tree)=>({...tr, nodes:{...tr.nodes, [edge.source]:{...tr.nodes[edge.source], connections: tr.nodes[edge.source].connections.map((elem:any)=>{elem.hasOwnProperty(edge.sourceHandle)? elem[edge.sourceHandle]= "" :null ; return elem})}}}))
 
         edgeUpdateSuccessful.current = true;
     }, []);
@@ -153,8 +202,8 @@ const DnDFlow = () => {
     }, [])
 
     useEffect(() => {
-        setNodes((nds) =>
-            nds.map((node) => {
+        setNodes((nds: any) =>
+            nds.map((node: { id: string; data: any; }) => {
                 if (node.id === '1') {
                     // it's important that you create a new object here
                     // in order to notify react flow about the change
@@ -170,8 +219,8 @@ const DnDFlow = () => {
     }, [nodeName, setNodes]);
 
     useEffect(() => {
-        setNodes((nds) =>
-            nds.map((node) => {
+        setNodes((nds: any) =>
+            nds.map((node: { id: string; style: any; }) => {
                 if (node.id === '1') {
                     // it's important that you create a new object here
                     // in order to notify react flow about the change
@@ -186,7 +235,13 @@ const DnDFlow = () => {
     const onConnect = useCallback((params: any) => {
         console.log("on connect")
         console.log(params)
-        setEdges((eds) => addEdge(params, eds))
+        if (params.source==='initialNode'){
+            setTree((tr:Tree)=>({...tr, entryNodeId:params.target}))
+        }else {
+            setTree((tr:Tree)=>({...tr, nodes:{...tr.nodes, [params.source]:{...tr.nodes[params.source], connections: tr.nodes[params.source].connections.map((elem:any)=>{elem.hasOwnProperty(params.sourceHandle)? elem[params.sourceHandle]= params.target :null ; return elem})}}}))
+        }
+
+        setEdges((eds: Edge[]) => addEdge(params, eds))
     }, []);
 
     const onSave = useCallback(() => {
@@ -241,22 +296,24 @@ const DnDFlow = () => {
                 return;
             }
 
-           
+
 
             const position = reactFlowInstanceState.project({
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
-           
-            const newNode = GetNewNode(type, position, nodes)
-            
 
-            setNodes((nds) => nds.concat(newNode()));
+            const newNode = GetNewNode(type, position, nodes)
+
+            console.log(CustomNodeToTreeNode(newNode))
+            setNodes((nds: any[]) => nds.concat(newNode));
+            setTree((tr:Tree)=>({...tr, nodes: {...tr.nodes, [newNode.id]:CustomNodeToTreeNode(newNode)}}))
         },
         [reactFlowInstanceState]
     );
 
     const bgColor = "#D3D3D3"
+    console.log(tree)
     return (
         <div className="dndflow">
 
