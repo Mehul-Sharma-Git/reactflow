@@ -133,6 +133,7 @@ const DnDFlow = () => {
                 setTree((tr: Tree) => ({ ...tr, staticNodes: { ...tr.staticNodes, [changes[0].id]: { position: { x: changes[0].position.x, y: changes[0].position.y } } } }))
             } else if(changes[0].type==='remove'){
                 const removeID = changes[0].id
+
                 setTree((tr:Tree)=>{
 
                     const copy = {...tr}
@@ -162,7 +163,7 @@ const DnDFlow = () => {
     const [reactFlowInstanceState, setreactFlowInstanceState] = useState<any>(null);
 
     const { setViewport } = useReactFlow();
-    // const reactFlowInstance = useReactFlow()
+    const reactFlowInstance = useReactFlow()
 
     const edgeUpdateSuccessful = useRef(true);
 
@@ -233,8 +234,7 @@ const DnDFlow = () => {
     }, [nodeBg, setNodes]);
 
     const onConnect = useCallback((params: any) => {
-        console.log("on connect")
-        console.log(params)
+        
         if (params.source==='initialNode'){
             setTree((tr:Tree)=>({...tr, entryNodeId:params.target}))
         }else {
@@ -296,8 +296,7 @@ const DnDFlow = () => {
                 return;
             }
 
-
-
+            // const nodes = reactFlowInstance.getNodes()
             const position = reactFlowInstanceState.project({
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
@@ -305,15 +304,13 @@ const DnDFlow = () => {
 
             const newNode = GetNewNode(type, position, nodes)
 
-            console.log(CustomNodeToTreeNode(newNode))
+            // console.log(CustomNodeToTreeNode(newNode))
             setNodes((nds: any[]) => nds.concat(newNode));
             setTree((tr:Tree)=>({...tr, nodes: {...tr.nodes, [newNode.id]:CustomNodeToTreeNode(newNode)}}))
         },
-        [reactFlowInstanceState]
+        [reactFlowInstanceState, nodes]
     );
-
     const bgColor = "#D3D3D3"
-    console.log(tree)
     return (
         <div className="dndflow">
 

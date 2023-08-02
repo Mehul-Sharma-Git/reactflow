@@ -47,19 +47,20 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                     }],
                     data: { label: `${type} node`, data: {} },
                 };
-                const isDropOnParentNode = nodes.find((node: any) => {
-                    if (node.type === 'parentGroup' && newNode.position.x >= node.position.x && newNode.position.x <= node.position.x + node.width && newNode.position.y >= node.position.y && newNode.position.y <= node.position.y + node.height) {
-                        newNode.position.x = newNode.position.x - node.position.x
-                        newNode.position.y = newNode.position.y - node.position.y
-                        return node
-                    }
-        
-        
-                })
-        
-        
-                newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined
-                return newNode
+                break;
+                case 'default' :
+
+                newNode = {
+                    id: uuidv4(),
+                    type,
+                    position,
+                    output: [{
+                        id:'output',
+                        displayName: 'output'
+                    }],
+                    data: { label: `${type} node`, data: {} },
+                };
+                break;
                 default :
                     newNode = {
                         id: uuidv4(),
@@ -76,9 +77,20 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                         ],
                         data: { label: `${type} node`, data: {} },
                     };
-                    return newNode
                     
         }
+        const isDropOnParentNode = nodes.find((node: any) => {
+            if (node.type === 'parentGroup' && newNode.position.x >= node.position.x && newNode.position.x <= node.position.x + node.width && newNode.position.y >= node.position.y && newNode.position.y <= node.position.y + node.height) {
+                newNode.position.x = newNode.position.x - node.position.x
+                newNode.position.y = newNode.position.y - node.position.y
+                return node
+            }
+
+
+        })
+
+        newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined
+        return newNode
     
 }
 
