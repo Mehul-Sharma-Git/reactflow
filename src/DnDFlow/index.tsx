@@ -30,6 +30,9 @@ import ConnectionLine from '../CustomConnectionLine/dottedAnimated';
 import EditableEdgeLine from '../CustomConnectionLine/editableEdgeLine'
 import SubFlowNode from '../SubFlowNode';
 import GetNewNode from '../CreateNewNode';
+import PropertiesBar from '../PropertiesBar';
+import PropertyNode from '../PropertyNode';
+import { useStateContext } from '../Contexts/contextProvider';
 
 type CustomNode = Node & {
     output?: any
@@ -65,7 +68,8 @@ const flowKey = 'example-flow';
 const nodeTypes = {
     textUpdater: TextUpdaterNode,
     custom: CustomNode,
-    parentGroup: SubFlowNode
+    parentGroup: SubFlowNode,
+    property: PropertyNode
 };
 
 
@@ -123,6 +127,7 @@ const DnDFlow = () => {
     const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [tree, setTree] = useState<any>(initialTree)
+    const {selectedNode, setSelectedNode} = useStateContext();
     const onNodesChange = useCallback(
         (changes: any) => {
             
@@ -163,12 +168,9 @@ const DnDFlow = () => {
     const [reactFlowInstanceState, setreactFlowInstanceState] = useState<any>(null);
 
     const { setViewport } = useReactFlow();
-    const reactFlowInstance = useReactFlow()
 
     const edgeUpdateSuccessful = useRef(true);
 
-    const [nodeName, setNodeName] = useState('Node 1');
-    const [nodeBg, setNodeBg] = useState('#eee');
     const onEdgeUpdateStart = useCallback(() => {
 
         console.log('start')
@@ -202,36 +204,36 @@ const DnDFlow = () => {
         }
     }, [])
 
-    useEffect(() => {
-        setNodes((nds: any) =>
-            nds.map((node: { id: string; data: any; }) => {
-                if (node.id === '1') {
-                    // it's important that you create a new object here
-                    // in order to notify react flow about the change
-                    node.data = {
-                        ...node.data,
-                        label: nodeName,
-                    };
-                }
+    // useEffect(() => {
+    //     setNodes((nds: any) =>
+    //         nds.map((node: { id: string; data: any; }) => {
+    //             if (node.id === '1') {
+    //                 // it's important that you create a new object here
+    //                 // in order to notify react flow about the change
+    //                 node.data = {
+    //                     ...node.data,
+    //                     label: nodeName,
+    //                 };
+    //             }
 
-                return node;
-            })
-        );
-    }, [nodeName, setNodes]);
+    //             return node;
+    //         })
+    //     );
+    // }, [nodeName, setNodes]);
 
-    useEffect(() => {
-        setNodes((nds: any) =>
-            nds.map((node: { id: string; style: any; }) => {
-                if (node.id === '1') {
-                    // it's important that you create a new object here
-                    // in order to notify react flow about the change
-                    node.style = { ...node.style, backgroundColor: nodeBg };
-                }
+    // useEffect(() => {
+    //     setNodes((nds: any) =>
+    //         nds.map((node: { id: string; style: any; }) => {
+    //             if (node.id === '1') {
+    //                 // it's important that you create a new object here
+    //                 // in order to notify react flow about the change
+    //                 node.style = { ...node.style, backgroundColor: nodeBg };
+    //             }
 
-                return node;
-            })
-        );
-    }, [nodeBg, setNodes]);
+    //             return node;
+    //         })
+    //     );
+    // }, [nodeBg, setNodes]);
 
     const onConnect = useCallback((params: any) => {
         
@@ -273,6 +275,11 @@ const DnDFlow = () => {
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
+    const onClick = (e:any) =>{
+        console.log(e.target)
+        setSelectedNode((prevNode:any)=>({...prevNode, selected:false}))
+    }
+
     // const onNodeDrag = useCallback((_: any, node: any) => {
     //     const intersections = getIntersectingNodes(node).map((n) => n.id);
 
@@ -310,10 +317,10 @@ const DnDFlow = () => {
         },
         [reactFlowInstanceState, nodes]
     );
-    const bgColor = "#D3D3D3"
+    const bgColor = "#F3F3F3"
     return (
         <div className="dndflow">
-
+            <Sidebar />
             <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                 <ReactFlow
                     nodes={nodes}
@@ -336,24 +343,22 @@ const DnDFlow = () => {
                     onEdgeUpdate={onEdgeUpdate}
                     onEdgeUpdateStart={onEdgeUpdateStart}
                     onEdgeUpdateEnd={onEdgeUpdateEnd}
+                    
+                    onPaneClick={onClick}
                 // selectNodesOnDrag={false}
                 // onNodeDrag={onNodeDrag}
                 >
                     <Background />
                     <Controls />
                     <div className="updatenode__controls">
-                        <label>label:</label>
-                        <input value={nodeName} onChange={(evt) => setNodeName(evt.target.value)} />
-
-                        <label className="updatenode__bglabel">background:</label>
-                        <input value={nodeBg} onChange={(evt) => setNodeBg(evt.target.value)} />
-
+                        
                         <button onClick={onSave}>save</button>
                         <button onClick={onRestore}>restore</button>
                     </div>
                 </ReactFlow>
+                
             </div>
-            <Sidebar />
+            <PropertiesBar/>
 
         </div>
     );

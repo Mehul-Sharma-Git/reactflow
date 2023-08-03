@@ -25,7 +25,10 @@ export default () => {
         EasyConnect Node
       </div>
       <div className="dndnode custom" onDragStart={(event) => onDragStart(event, 'parentGroup' )} draggable>
-        SubFlowNode
+        SubFlow Node
+      </div>
+      <div className="dndnode custom" onDragStart={(event) => onDragStart(event, 'property' )} draggable>
+        Property Node
       </div>
     </aside>
   );

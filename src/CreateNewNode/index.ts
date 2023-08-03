@@ -45,7 +45,7 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                         id:'output',
                         displayName: 'output'
                     }],
-                    data: { label: `${type} node`, data: {} },
+                    data: { label: `${type} node` },
                 };
                 break;
                 case 'default' :
@@ -58,9 +58,39 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                         id:'output',
                         displayName: 'output'
                     }],
-                    data: { label: `${type} node`, data: {} },
+                    data: { label: `${type} node` },
                 };
                 break;
+                case 'property' :
+
+                newNode = {
+                    id: uuidv4(),
+                    type,
+                    position,
+                    output: [{
+                        id:'output',
+                        displayName: 'output'
+                    }],
+                    data: { label: `${type} node`, text:"", amount:0, boolValue:false },
+                };
+                break;
+                case 'textUpdater':
+                    newNode = {
+                        id: uuidv4(),
+                        type,
+                        position,
+                        output:[
+                            { 
+                                id:'true',
+                                displayName:'True'
+                            },
+                            {   id:'false',
+                                displayName:'False'
+                            }
+                        ],
+                        data: { label: `${type} node`, text:"" },
+                    };
+                    break;
                 default :
                     newNode = {
                         id: uuidv4(),
@@ -75,7 +105,7 @@ const GetNewNode = (type:any, position:any, nodes: CustomNode[]) => {
                                 displayName:'False'
                             }
                         ],
-                        data: { label: `${type} node`, data: {} },
+                        data: { label: `${type} node` },
                     };
                     
         }
