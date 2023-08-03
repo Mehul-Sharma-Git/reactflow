@@ -93,25 +93,7 @@ const nodeTypes = {
 //     stroke: 'black',
 // };
 
-type Tree ={
-    "entryNodeId": string,
-    "nodes": any,
-    "staticNodes": {
-        "successFinalNode": { "position": { x: Number, y: Number } },
-        "failureFinalNode": { "position": { x: Number, y: Number } },
-        "initialNode": { "position": { x: Number, y: Number } }
-    },
-}
-const initialTree: Tree = {
-    "entryNodeId": "",
-    "nodes": {},
-    "staticNodes": {
-        "successFinalNode": { "position": { x: 100, y: 300 } },
-        "failureFinalNode": { "position": { x: 400, y: 300 } },
-        "initialNode": { "position": { x: 250, y: -300 } }
-    },
 
-}
 
 const CustomNodeToTreeNode = (node:CustomNode)=>{
 
@@ -126,20 +108,21 @@ const DnDFlow = () => {
     const reactFlowWrapper: any = useRef(null);
     const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
     const [edges, setEdges] = useState<Edge[]>([]);
-    const [tree, setTree] = useState<any>(initialTree)
+    const {tree, setTree} = useStateContext();
     const {selectedNode, setSelectedNode} = useStateContext();
+    console.log(tree)
     const onNodesChange = useCallback(
         (changes: any) => {
-            
+            console.log('on nodes change')
             setNodes((nds) => applyNodeChanges(changes, nds))
             
             if (changes[0].type === 'position' && changes[0].dragging === true && (changes[0].id === "successFinalNode" || changes[0].id === "failureFinalNode" || changes[0].id === "initialNode")) {
                 
-                setTree((tr: Tree) => ({ ...tr, staticNodes: { ...tr.staticNodes, [changes[0].id]: { position: { x: changes[0].position.x, y: changes[0].position.y } } } }))
+                setTree((tr: any) => ({ ...tr, staticNodes: { ...tr.staticNodes, [changes[0].id]: { position: { x: changes[0].position.x, y: changes[0].position.y } } } }))
             } else if(changes[0].type==='remove'){
                 const removeID = changes[0].id
-
-                setTree((tr:Tree)=>{
+                console.log(changes)
+                setTree((tr:any)=>{
 
                     const copy = {...tr}
 
@@ -174,27 +157,32 @@ const DnDFlow = () => {
     const onEdgeUpdateStart = useCallback(() => {
 
         console.log('start')
+        console.log(tree)
         edgeUpdateSuccessful.current = false;
-    }, []);
+    }, [tree]);
     const onEdgeUpdate = useCallback((oldEdge: any, newConnection: any) => {
         console.log('edge update')
         console.log(oldEdge)
         console.log(newConnection)
+        console.log(tree)
         edgeUpdateSuccessful.current = true;
         setEdges((els: Edge[]) => updateEdge(oldEdge, newConnection, els));
-    }, []);
+    }, [tree]);
 
     const onEdgeUpdateEnd = useCallback((_: any, edge: any) => {
-        console.log('end')
-        console.log(_)
-        console.log(edge)
         if (!edgeUpdateSuccessful.current) {
             setEdges((eds: any[]) => eds.filter((e: { id: any; }) => e.id !== edge.id));
         }
-        setTree((tr:Tree)=>({...tr, nodes:{...tr.nodes, [edge.source]:{...tr.nodes[edge.source], connections: tr.nodes[edge.source].connections.map((elem:any)=>{elem.hasOwnProperty(edge.sourceHandle)? elem[edge.sourceHandle]= "" :null ; return elem})}}}))
+        if (edge.source==='initialNode'){
+            setTree((tr:any)=>({...tr, entryNodeId:""}))
+        }else {
+            setTree((tr:any)=>({...tr, nodes:{...tr.nodes, [edge.source]:{...tr.nodes[edge.source], connections: tr.nodes[edge.source].connections.map((elem:any)=>{elem.hasOwnProperty(edge.sourceHandle)? elem[edge.sourceHandle]= "" :null ; return elem})}}}))
+
+        }
+        
 
         edgeUpdateSuccessful.current = true;
-    }, []);
+    }, [tree]);
 
     useEffect(() => {
         // Use this for setting noes from json 
@@ -236,15 +224,16 @@ const DnDFlow = () => {
     // }, [nodeBg, setNodes]);
 
     const onConnect = useCallback((params: any) => {
-        
+            console.log(tree)
+            console.log('onConnect')
         if (params.source==='initialNode'){
-            setTree((tr:Tree)=>({...tr, entryNodeId:params.target}))
+            setTree((tr:any)=>({...tr, entryNodeId:params.target}))
         }else {
-            setTree((tr:Tree)=>({...tr, nodes:{...tr.nodes, [params.source]:{...tr.nodes[params.source], connections: tr.nodes[params.source].connections.map((elem:any)=>{elem.hasOwnProperty(params.sourceHandle)? elem[params.sourceHandle]= params.target :null ; return elem})}}}))
+            setTree((tr:any)=>({...tr, nodes:{...tr.nodes, [params.source]:{...tr.nodes[params.source], connections: tr.nodes[params.source].connections.map((elem:any)=>{elem.hasOwnProperty(params.sourceHandle)? elem[params.sourceHandle]= params.target :null ; return elem})}}}))
         }
 
         setEdges((eds: Edge[]) => addEdge(params, eds))
-    }, []);
+    }, [tree]);
 
     const onSave = useCallback(() => {
         if (reactFlowInstanceState) {
@@ -276,8 +265,10 @@ const DnDFlow = () => {
     }, []);
 
     const onClick = (e:any) =>{
-        console.log(e.target)
-        setSelectedNode((prevNode:any)=>({...prevNode, selected:false}))
+        if(selectedNode){
+            setSelectedNode((prevNode:any)=>({...prevNode, selected:false}))
+
+        }
     }
 
     // const onNodeDrag = useCallback((_: any, node: any) => {
@@ -313,10 +304,35 @@ const DnDFlow = () => {
 
             // console.log(CustomNodeToTreeNode(newNode))
             setNodes((nds: any[]) => nds.concat(newNode));
-            setTree((tr:Tree)=>({...tr, nodes: {...tr.nodes, [newNode.id]:CustomNodeToTreeNode(newNode)}}))
+            setTree((tr:any)=>({...tr, nodes: {...tr.nodes, [newNode.id]:CustomNodeToTreeNode(newNode)}}))
         },
         [reactFlowInstanceState, nodes]
     );
+
+    const downloadFile = ({ data, fileName, fileType }:any) => {
+        // Create a blob with the data we want to download as a file
+        const blob = new Blob([data], { type: fileType })
+        // Create an anchor element and dispatch a click event on it
+        // to trigger a download
+        const a = document.createElement('a')
+        a.download = fileName
+        a.href = window.URL.createObjectURL(blob)
+        const clickEvt = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+        })
+        a.dispatchEvent(clickEvt)
+        a.remove()
+      }
+    const getJSON = (e:any)=>{
+        e.preventDefault()
+        downloadFile({
+          data: JSON.stringify({journeyId: "1", tree: tree, nodes: nodes}),
+          fileName: 'tree.json',
+          fileType: 'text/json',
+        })
+    }
     const bgColor = "#F3F3F3"
     return (
         <div className="dndflow">
@@ -354,6 +370,7 @@ const DnDFlow = () => {
                         
                         <button onClick={onSave}>save</button>
                         <button onClick={onRestore}>restore</button>
+                        <button onClick ={getJSON}>Get JSON</button>
                     </div>
                 </ReactFlow>
                 

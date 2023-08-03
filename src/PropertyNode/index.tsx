@@ -26,11 +26,17 @@ function PropertyNode({data, isConnectable, selected }:any) {
         }
       }, [selected, nodeId])
       
+      const handleStyle = {
+        backgroundColor: 'red'
+      }
 
+      const divStyle = {
+        border:'1px solid red'
+      }
 
   return (
-    <div className="text-updater-node" style={selected?{backgroundColor:'red'}:{}}>
-      <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
+    <div className="text-updater-node" style={selected?divStyle:{}}>
+      <Handle style={selected?handleStyle:{}} type="target" position={Position.Left} isConnectable={isConnectable} />
       <div >
         {/* <label htmlFor="text">Text:</label> */}
         {/* <input id="text" name="text" onChange={onChange} className="nodrag" value={text} /> */}
@@ -45,7 +51,7 @@ function PropertyNode({data, isConnectable, selected }:any) {
         isConnectable={isConnectable}
         content='true'
       /> */}
-      <Handle type="source" position={Position.Right} id="output" isConnectable={isConnectable} />
+      <Handle style={selected?handleStyle:{}} type="source" position={Position.Right} id="output" isConnectable={isConnectable} />
     </div>
   );
 }

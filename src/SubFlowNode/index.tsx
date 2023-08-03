@@ -7,7 +7,7 @@ import './index.css'
 const handleStyle = { left: 10 };
 
   
-function SubFlowNode({data, isConnectable }:any) {
+function SubFlowNode({data, isConnectable, selected }:any) {
     // const nodeId = useNodeId();
     // const [text, setText] = useState("")
 
@@ -55,15 +55,23 @@ function SubFlowNode({data, isConnectable }:any) {
     
 //   },[])
 
+const handleStyle = {
+  backgroundColor: 'red'
+}
+
+const divStyle = {
+  border:'1px solid red'
+}
+
   return (
-    <div className="parent-node">
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+    <div className="parent-node" style={selected?divStyle:{}}>
+      <Handle style={selected?handleStyle:{}} type="target" position={Position.Top} isConnectable={isConnectable} />
       <div>
 
         {/* <input id="text" name="text" onChange={onChange} className="nodrag" value={text} />
         <button onClick={onDelete}>Delete</button> */}
       </div>
-      <Handle type="source" position={Position.Bottom} id="output" isConnectable={isConnectable} />
+      <Handle style={selected?handleStyle:{}} type="source" position={Position.Bottom} id="output" isConnectable={isConnectable} />
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { useNodeId } from 'reactflow';
 
 import './index.css'
 import { useStateContext } from '../Contexts/contextProvider';
-const handleStyle = { top: 10 };
 
   
 function TextUpdaterNode({data, isConnectable, selected }:any) {
@@ -73,12 +72,25 @@ function TextUpdaterNode({data, isConnectable, selected }:any) {
     
   // },[])
 
+  const handleLeftStyle = {
+    backgroundColor: 'red',
+    top: 10
+  }
+  const handleBackgroundStyle = {
+    backgroundColor: 'red'
+  }
+  const handleStyle = { top: 10 };
+
+
+  const divStyle = {
+    border:'1px solid red'
+  }
   return (
-    <div className="text-updater-node">
-      <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
+    <div className="text-updater-node" style={selected?divStyle:{}}>
+      <Handle style={selected?handleBackgroundStyle:{}} type="target" position={Position.Left} isConnectable={isConnectable} />
       <div>
         <label htmlFor="text">{data.label}</label>
-        <input id="text" name="text" onChange={onChange} className="nodrag" value={text} />
+        {/* <input id="text" name="text" onChange={onChange} className="nodrag" value={text} /> */}
         {/* <button onClick={onDelete}>Delete</button> */}
       </div>
       
@@ -86,11 +98,11 @@ function TextUpdaterNode({data, isConnectable, selected }:any) {
         type="source"
         position={Position.Right}
         id="true"
-        style={handleStyle}
+        style={selected?handleLeftStyle:handleStyle}
         isConnectable={isConnectable}
         content='true'
       />
-      <Handle type="source" position={Position.Right} id="false" isConnectable={isConnectable} />
+      <Handle style={selected?handleBackgroundStyle:{}} type="source" position={Position.Right} id="false" isConnectable={isConnectable} />
     </div>
   );
 }
