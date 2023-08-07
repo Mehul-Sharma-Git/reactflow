@@ -1,11 +1,13 @@
 .parent-node {
-    height: inherit;
+    /* height: 140px; */
     border: 1px solid #eee;
     /* padding: 5px; */
     border-radius: 5px;
     background: white;
     border: 1px solid black;
-    background-color: rgba(255, 0, 0, 0.2);
+    /* background-color: rgba(255, 0, 0, 0.2); */
+    width: 170px;
+
   }
   
   .text-updater-node label {

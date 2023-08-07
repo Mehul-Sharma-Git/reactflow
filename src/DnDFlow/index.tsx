@@ -104,10 +104,10 @@ const DnDFlow = () => {
 	const reactFlowWrapper: any = useRef(null);
 	const { tree, setTree } = useStateContext();
 	const { selectedNode, setSelectedNode } = useStateContext();
-	console.log(tree);
+	// console.log(tree);
 	const { nodes, setNodes, edges, setEdges } = useStateContext();
 	const onNodesChange = useCallback((changes: any) => {
-		console.log('on nodes change');
+		// console.log('on nodes change');
 		setNodes((nds: any) => applyNodeChanges(changes, nds));
 
 		if (
@@ -131,7 +131,7 @@ const DnDFlow = () => {
 			}));
 		} else if (changes[0].type === 'remove') {
 			const removeID = changes[0].id;
-			console.log(changes);
+			// console.log(changes);
 			setTree((tr: any) => {
 				const copy = { ...tr };
 
@@ -148,11 +148,22 @@ const DnDFlow = () => {
 				}
 				return copy;
 			});
+			setNodes((nds: any) =>
+				nds.map((node: any) => {
+					node.nodes = node.nodes
+						? node.nodes.filter((nd: any) => {
+								return nd.id !== changes[0].id;
+						  })
+						: null;
+					return node;
+				})
+			);
 		}
 	}, []);
+	console.log(nodes);
 	const onEdgesChange = useCallback((changes: any) => {
-		console.log('edge changes');
-		console.log(changes);
+		// console.log('edge changes');
+		// console.log(changes);
 		setEdges((eds: Edge<any>[]) => applyEdgeChanges(changes, eds));
 	}, []);
 
@@ -165,16 +176,16 @@ const DnDFlow = () => {
 	const edgeUpdateSuccessful = useRef(true);
 
 	const onEdgeUpdateStart = useCallback(() => {
-		console.log('start');
-		console.log(tree);
+		// console.log('start');
+		// console.log(tree);
 		edgeUpdateSuccessful.current = false;
 	}, [tree]);
 	const onEdgeUpdate = useCallback(
 		(oldEdge: any, newConnection: any) => {
-			console.log('edge update');
-			console.log(oldEdge);
-			console.log(newConnection);
-			console.log(tree);
+			// console.log('edge update');
+			// console.log(oldEdge);
+			// console.log(newConnection);
+			// console.log(tree);
 			edgeUpdateSuccessful.current = true;
 			setEdges((els: Edge[]) => updateEdge(oldEdge, newConnection, els));
 		},
@@ -256,8 +267,8 @@ const DnDFlow = () => {
 
 	const onConnect = useCallback(
 		(params: any) => {
-			console.log(tree);
-			console.log('onConnect');
+			// console.log(tree);
+			// console.log('onConnect');
 			if (params.source === 'initialNode') {
 				setTree((tr: any) => ({ ...tr, entryNodeId: params.target }));
 			} else {
@@ -288,7 +299,7 @@ const DnDFlow = () => {
 
 	const onSave = useCallback(() => {
 		if (reactFlowInstanceState) {
-			console.log(reactFlowInstanceState.toObject());
+			// console.log(reactFlowInstanceState.toObject());
 			const flow = reactFlowInstanceState.toObject();
 			localStorage.setItem(flowKey, JSON.stringify(flow));
 		}
@@ -341,6 +352,32 @@ const DnDFlow = () => {
 
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
+			if (event.dataTransfer.getData('application/childNode')) {
+				const nodeId = event.dataTransfer.getData(
+					'application/childNode'
+				);
+				setNodes((nds: any) =>
+					nds.map((node: any) => {
+						if (node.id === nodeId) {
+							node.hidden = false;
+							node.draggable = true;
+							node.parentNode = undefined;
+							node.extent = undefined;
+							const position = reactFlowInstanceState.project({
+								x: event.clientX - reactFlowBounds.left,
+								y: event.clientY - reactFlowBounds.top,
+							});
+							node.position = position;
+						}
+						node.nodes = node.nodes
+							? node.nodes.filter((nd: any) => {
+									return nd.id !== nodeId;
+							  })
+							: null;
+						return node;
+					})
+				);
+			}
 			const type = event.dataTransfer.getData('application/reactflow');
 			// check if the dropped element is valid
 			if (typeof type === 'undefined' || !type) {
@@ -420,13 +457,14 @@ const DnDFlow = () => {
 				tree: tree,
 				nodes: requiredMainNodes,
 				innerNodes: requiredInnerNodes,
+				edges: edges,
 			}),
 			fileName: 'tree.json',
 			fileType: 'text/json',
 		});
 	};
 	const bgColor = '#F3F3F3';
-	console.log(nodes);
+	// console.log(nodes);
 	return (
 		<div className='dndflow'>
 			<Sidebar />

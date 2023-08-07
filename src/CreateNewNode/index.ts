@@ -30,17 +30,18 @@ type CustomNode = Node & {
 //     parentNode?: any
 // }
 let newNode: CustomNode;
-const GetNewNode = (type: any, position: any, nodes: CustomNode[], setNodes:any) => {
+const GetNewNode = (
+	type: any,
+	position: any,
+	nodes: CustomNode[],
+	setNodes: any
+) => {
 	switch (type) {
 		case 'parentGroup':
 			newNode = {
 				id: uuidv4(),
 				type,
 				position,
-				style: {
-					width: 170,
-					height: 140,
-				},
 				output: [
 					{
 						id: 'output',
@@ -48,6 +49,7 @@ const GetNewNode = (type: any, position: any, nodes: CustomNode[], setNodes:any)
 					},
 				],
 				data: { label: `${type} node` },
+				
 			};
 			break;
 		case 'default':
@@ -114,34 +116,46 @@ const GetNewNode = (type: any, position: any, nodes: CustomNode[], setNodes:any)
 			};
 	}
 	const isDropOnParentNode = nodes.find((node: any) => {
+	
 		if (
+
 			node.type === 'parentGroup' &&
 			newNode.position.x >= node.position.x &&
 			newNode.position.x <= node.position.x + node.width &&
 			newNode.position.y >= node.position.y &&
 			newNode.position.y <= node.position.y + node.height
 		) {
-			newNode.position.x = newNode.position.x - node.position.x;
-			newNode.position.y = newNode.position.y - node.position.y;
+			// newNode.position.x = newNode.position.x - node.position.x;
+			// newNode.position.y = newNode.position.y - node.position.y;
+			newNode.position.x = 10 ;
+			
+			newNode.position.y = node.nodes?node.nodes.length*42 + 41 : 41 ;
 			return node;
 		}
 	});
 
 	if (isDropOnParentNode) {
-        const {position,output, parentNode, ...childNode} = newNode
+		const { position, output, parentNode, ...childNode } = newNode;
 		setNodes((nds: any) =>
 			nds.map((node: any) => {
 				node.id === isDropOnParentNode.id
-					? node.nodes
-						? node.nodes.push(childNode)
-						: (node.nodes = [childNode])
+					? (node.nodes
+							? (node.nodes.push(childNode),node.height+=30)
+							: (node.nodes = [childNode])
+
+					)
 					: null;
+
 				return node;
 			})
 		);
 	}
 
 	newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined;
+	newNode.extent = isDropOnParentNode ? 'parent' : undefined;
+	// newNode.draggable= isDropOnParentNode ? false : true;
+	newNode.hidden= isDropOnParentNode ? true : false;
+
 	return newNode;
 };
 
