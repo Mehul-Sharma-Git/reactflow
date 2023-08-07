@@ -102,14 +102,13 @@ const CustomNodeToTreeNode = (node: CustomNode) => {
 };
 const DnDFlow = () => {
 	const reactFlowWrapper: any = useRef(null);
-	const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
-	const [edges, setEdges] = useState<Edge[]>([]);
 	const { tree, setTree } = useStateContext();
 	const { selectedNode, setSelectedNode } = useStateContext();
 	console.log(tree);
+	const { nodes, setNodes, edges, setEdges } = useStateContext();
 	const onNodesChange = useCallback((changes: any) => {
 		console.log('on nodes change');
-		setNodes((nds) => applyNodeChanges(changes, nds));
+		setNodes((nds: any) => applyNodeChanges(changes, nds));
 
 		if (
 			changes[0].type === 'position' &&
@@ -354,7 +353,7 @@ const DnDFlow = () => {
 				y: event.clientY - reactFlowBounds.top,
 			});
 
-			const newNode = GetNewNode(type, position, nodes);
+			const newNode = GetNewNode(type, position, nodes, setNodes);
 
 			// console.log(CustomNodeToTreeNode(newNode))
 			setNodes((nds: any[]) => nds.concat(newNode));
@@ -387,13 +386,47 @@ const DnDFlow = () => {
 	};
 	const getJSON = (e: any) => {
 		e.preventDefault();
+		const mainNodes = nodes.filter((node: any) => {
+			return node.parentNode === undefined;
+		});
+		const innerNodes = nodes.filter((node: any) => {
+			return node.parentNode !== undefined;
+		});
+		const requiredMainNodes = mainNodes.reduce(
+			(accumulator: any, value: any) => {
+				return { ...accumulator, [value.id]: value };
+			},
+			{}
+		);
+		const requiredInnerNodes = innerNodes.reduce(
+			(accumulator: any, value: any) => {
+				return { ...accumulator, [value.id]: value };
+			},
+			{}
+		);
+		// console.log(requiredNodes);
+		// downloadFile({
+		// 	data: JSON.stringify({
+		// 		originalNodes: nodes,
+		// 		convertedNodes: Object.values(requiredNodes),
+		// 	}),
+		// 	fileName: 'tree.json',
+		// 	fileType: 'text/json',
+		// });
+
 		downloadFile({
-			data: JSON.stringify({ journeyId: '1', tree: tree, nodes: nodes }),
+			data: JSON.stringify({
+				journeyId: '1',
+				tree: tree,
+				nodes: requiredMainNodes,
+				innerNodes: requiredInnerNodes,
+			}),
 			fileName: 'tree.json',
 			fileType: 'text/json',
 		});
 	};
 	const bgColor = '#F3F3F3';
+	console.log(nodes);
 	return (
 		<div className='dndflow'>
 			<Sidebar />
