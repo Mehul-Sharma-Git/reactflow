@@ -16,10 +16,12 @@ import ReactFlow, {
 } from 'reactflow';
 import { v4 as uuidv4 } from 'uuid';
 import { useStateContext } from '../Contexts/contextProvider';
+import checkParentNodeDrop from '../CheckParentNodeDrop';
 // import CustomNode from '../EasyConnectNode';
 
 type CustomNode = Node & {
 	output?: any;
+	nodes?: any;
 };
 // interface parentGroupNode extends Node[] {
 //     id:string,
@@ -42,6 +44,7 @@ const GetNewNode = (
 				id: uuidv4(),
 				type,
 				position,
+				nodes:[],
 				output: [
 					{
 						id: 'output',
@@ -115,48 +118,10 @@ const GetNewNode = (
 				data: { label: `${type} node` },
 			};
 	}
-	const isDropOnParentNode = nodes.find((node: any) => {
 	
-		if (
+	const updatedNode = checkParentNodeDrop(newNode, nodes, setNodes)
 
-			node.type === 'parentGroup' &&
-			newNode.position.x >= node.position.x &&
-			newNode.position.x <= node.position.x + node.width &&
-			newNode.position.y >= node.position.y &&
-			newNode.position.y <= node.position.y + node.height
-		) {
-			// newNode.position.x = newNode.position.x - node.position.x;
-			// newNode.position.y = newNode.position.y - node.position.y;
-			newNode.position.x = 10 ;
-			
-			newNode.position.y = node.nodes?node.nodes.length*42 + 41 : 41 ;
-			return node;
-		}
-	});
-
-	if (isDropOnParentNode) {
-		const { position, output, parentNode, ...childNode } = newNode;
-		setNodes((nds: any) =>
-			nds.map((node: any) => {
-				node.id === isDropOnParentNode.id
-					? (node.nodes
-							? (node.nodes.push(childNode),node.height+=30)
-							: (node.nodes = [childNode])
-
-					)
-					: null;
-
-				return node;
-			})
-		);
-	}
-
-	newNode.parentNode = isDropOnParentNode ? isDropOnParentNode.id : undefined;
-	newNode.extent = isDropOnParentNode ? 'parent' : undefined;
-	// newNode.draggable= isDropOnParentNode ? false : true;
-	newNode.hidden= isDropOnParentNode ? true : false;
-
-	return newNode;
+	return updatedNode;
 };
 
 export default GetNewNode;

@@ -10,12 +10,16 @@ const handleStyle = { left: 10 };
 function SubFlowNode({ data, isConnectable, selected }: any) {
 	const { nodes } = useStateContext();
 	const nodeId = useNodeId();
-	const [dragOver, setDragOver] = useState(false);
+
 	const [targetElement, setTargetElement] = useState(false);
 	const [divSelected, setDivSelected] = useState('');
 	const { setNodes } = useStateContext();
-	const { selectedNode, setSelectedNode } = useStateContext();
-
+	const {
+		selectedNode,
+		setSelectedNode,
+		dragOverParentNode,
+		setDragOverParentNode,
+	} = useStateContext();
 	// const nodeId = useNodeId();
 	// const [text, setText] = useState("")
 
@@ -91,15 +95,15 @@ function SubFlowNode({ data, isConnectable, selected }: any) {
 		e.preventDefault();
 		e.stopPropagation();
 		setTargetElement(e.target);
-		setNodes((nds: any) =>
-			nds.map((node: any) => {
-				if (node.id === nodeId) {
-					node.height += 30;
-				}
-				return node;
-			})
-		);
-		setDragOver(true);
+		// setNodes((nds: any) =>
+		// 	nds.map((node: any) => {
+		// 		if (node.id === nodeId) {
+		// 			node.height += 30;
+		// 		}
+		// 		return node;
+		// 	})
+		// );
+		setDragOverParentNode(nodeId);
 		console.log('drag enter');
 	};
 	const onDragLeave = (e: any) => {
@@ -108,21 +112,22 @@ function SubFlowNode({ data, isConnectable, selected }: any) {
 		if (targetElement === e.target) {
 			e.preventDefault();
 			e.stopPropagation();
-			setNodes((nds: any) =>
-				nds.map((node: any) => {
-					if (node.id === nodeId) {
-						node.height -= 30;
-					}
-					return node;
-				})
-			);
+			// setNodes((nds: any) =>
+			// 	nds.map((node: any) => {
+			// 		if (node.id === nodeId) {
+			// 			node.height -= 30;
+			// 		}
+			// 		return node;
+			// 	})
+			// );
 
-			setDragOver(false);
+			setDragOverParentNode('');
 			console.log('drag leave');
 		}
 	};
-	const onDrop = () => {
-		setDragOver(false);
+	const onDrop = (e: any) => {
+		setDragOverParentNode('');
+		console.log('dropping');
 	};
 	const onDragStart = (event: any, nodeId: any) => {
 		event.dataTransfer.setData('application/childNode', nodeId);
@@ -152,6 +157,7 @@ function SubFlowNode({ data, isConnectable, selected }: any) {
 
 		margin: '2px',
 	};
+	// console.log(nodes);
 	return (
 		<div
 			className='parent-node'
@@ -171,10 +177,14 @@ function SubFlowNode({ data, isConnectable, selected }: any) {
 					display: 'flex',
 					flexDirection: 'column',
 					alignItems: 'center',
-					pointerEvents: `${dragOver ? 'none' : 'auto'}`,
+					pointerEvents: `${
+						dragOverParentNode === nodeId ? 'none' : 'auto'
+					}`,
 				}}>
 				{nodes.map((node: any) => {
-					if (node.id === nodeId && node.nodes) {
+					// node.id === nodeId ? console.log(node) : null;
+					// node.id === nodeId ? console.log(node.nodes?.length) : null;
+					if (node.id === nodeId && node.nodes?.length > 0) {
 						return node.nodes.map((nd: any) => {
 							return (
 								<div
@@ -196,21 +206,21 @@ function SubFlowNode({ data, isConnectable, selected }: any) {
 									onDragStart={(e: any) => {
 										onDragStart(e, nd.id);
 									}}>
-									{nd.type}
+									<p style={{ fontSize: '9px' }}>{nd.id}</p>
 								</div>
 							);
 						});
 					}
 				})}
 
-				{dragOver ? (
+				{dragOverParentNode === nodeId ? (
 					<div
 						style={{
 							margin: '1px auto',
 							width: '140px',
 							height: '40px',
 							border: '1px solid black',
-							backgroundColor: 'grey',
+							backgroundColor: 'lightgrey',
 						}}></div>
 				) : null}
 				{/* <input id="text" name="text" onChange={onChange} className="nodrag" value={text} />

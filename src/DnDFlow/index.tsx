@@ -33,6 +33,7 @@ import GetNewNode from '../CreateNewNode';
 import PropertiesBar from '../PropertiesBar';
 import PropertyNode from '../PropertyNode';
 import { useStateContext } from '../Contexts/contextProvider';
+import checkParentNodeDrop from '../CheckParentNodeDrop';
 
 type CustomNode = Node & {
 	output?: any;
@@ -105,7 +106,16 @@ const DnDFlow = () => {
 	const { tree, setTree } = useStateContext();
 	const { selectedNode, setSelectedNode } = useStateContext();
 	// console.log(tree);
-	const { nodes, setNodes, edges, setEdges } = useStateContext();
+	const {
+		nodes,
+		setNodes,
+		edges,
+		setEdges,
+		setDragOverParentNode,
+	} = useStateContext();
+	const [reactFlowInstanceState, setreactFlowInstanceState] = useState<any>(
+		null
+	);
 	const onNodesChange = useCallback((changes: any) => {
 		// console.log('on nodes change');
 		setNodes((nds: any) => applyNodeChanges(changes, nds));
@@ -160,17 +170,14 @@ const DnDFlow = () => {
 			);
 		}
 	}, []);
-	console.log(nodes);
+	// console.log(nodes);
 	const onEdgesChange = useCallback((changes: any) => {
 		// console.log('edge changes');
 		// console.log(changes);
 		setEdges((eds: Edge<any>[]) => applyEdgeChanges(changes, eds));
 	}, []);
 
-	const [reactFlowInstanceState, setreactFlowInstanceState] = useState<any>(
-		null
-	);
-
+	// console.log(reactFlowInstanceState);
 	const { setViewport } = useReactFlow();
 
 	const edgeUpdateSuccessful = useRef(true);
@@ -335,16 +342,116 @@ const DnDFlow = () => {
 		}
 	};
 
-	// const onNodeDrag = useCallback((_: any, node: any) => {
-	//     const intersections = getIntersectingNodes(node).map((n) => n.id);
+	// const getIntersectingNodes = (e: any, node: any) => {};
+	const onNodeDrag = useCallback(
+		(_: any, node: any) => {
+			// const intersections = getIntersectingNodes(node).map((n: any) => n.id);
+			// setNodes((ns: any) =>
+			// 	ns.map((n: any) => ({
+			// 		...n,
+			// 		className: intersections.includes(n.id) ? 'highlight' : '',
+			// 	}))
+			// );
+			// console.log(node);
+			// getIntersectingNodes(_, node);
+			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+			console.log(reactFlowInstanceState);
+			const position = reactFlowInstanceState.project({
+				x: _.clientX - reactFlowBounds.left,
+				y: _.clientY - reactFlowBounds.top,
+			});
+			const isDropOnParentNode = nodes.find((nd: any) => {
+				if (
+					nd.type === 'parentGroup' &&
+					node.type !== 'parentGroup' &&
+					position.x >= nd.position.x &&
+					position.x <= nd.position.x + nd.width &&
+					position.y >= nd.position.y &&
+					position.y <= nd.position.y + nd.height
+				) {
+					console.log('drag');
+					// newNode.position.x = newNode.position.x - node.position.x;
+					// newNode.position.y = newNode.position.y - node.position.y;
+					// newNode.position.x = 10;
+					setDragOverParentNode(nd.id);
+					// newNode.position.y = node.nodes ? node.nodes.length * 42 + 41 : 41;
+					return nd;
+				} else {
+					setDragOverParentNode('');
+				}
+			});
+		},
+		[reactFlowInstanceState, nodes]
+	);
 
-	//     setNodes((ns) =>
-	//         ns.map((n) => ({
-	//             ...n,
-	//             className: intersections.includes(n.id) ? 'highlight' : '',
-	//         }))
-	//     );
-	// }, []);
+	const onNodeDragStart = useCallback(() => {
+		console.log('drag start');
+	}, []);
+
+	const onNodeDragStop = useCallback(
+		(e: any, node: any) => {
+			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+			const position = reactFlowInstanceState.project({
+				x: e.clientX - reactFlowBounds.left,
+				y: e.clientY - reactFlowBounds.top,
+			});
+
+			const isDropOnParentNode = nodes.find((nd: any) => {
+				if (
+					nd.type === 'parentGroup' &&
+					node.type !== 'parentGroup' &&
+					position.x >= nd.position.x &&
+					position.x <= nd.position.x + nd.width &&
+					position.y >= nd.position.y &&
+					position.y <= nd.position.y + nd.height
+				) {
+					// newNode.position.x = newNode.position.x - node.position.x;
+					// newNode.position.y = newNode.position.y - node.position.y;
+					// newNode.position.x = 10;
+					setDragOverParentNode('');
+					// newNode.position.y = node.nodes ? node.nodes.length * 42 + 41 : 41;
+					return nd;
+				}
+			});
+
+			if (isDropOnParentNode) {
+				console.log(isDropOnParentNode);
+				const { position, output, parentNode, ...childNode } = node;
+				// console.log(childNode);
+				setNodes((nds: any) =>
+					nds.map((nd: any) => {
+						console.log(nd);
+						if (nd.id === isDropOnParentNode.id) {
+							const foundNode = nd.nodes.find((node: any) => {
+								return node.id === childNode.id;
+							});
+							if (!foundNode) {
+								nd.nodes.push(childNode);
+							}
+						}
+
+						if (nd.id === node.id) {
+							nd.parentNode = isDropOnParentNode.id;
+							nd.extent = 'parent';
+							// newNode.draggable= isDropOnParentNode ? false : true;
+							nd.hidden = true;
+						}
+						// console.log(nd);
+						return nd;
+					})
+				);
+			}
+
+			// if (nd.id === node.id) {
+
+			// 	node.hidden = true;
+			// 	// node.parentNode =
+			// 	return node
+			// }
+			console.log('drag stop');
+		},
+		[reactFlowInstanceState, nodes]
+	);
 
 	const onDrop = useCallback(
 		(event: any) => {
@@ -492,8 +599,9 @@ const DnDFlow = () => {
 					onEdgeUpdateEnd={onEdgeUpdateEnd}
 					onPaneClick={onClick}
 					// selectNodesOnDrag={false}
-					// onNodeDrag={onNodeDrag}
-				>
+					onNodeDrag={onNodeDrag}
+					onNodeDragStart={onNodeDragStart}
+					onNodeDragStop={onNodeDragStop}>
 					<Background />
 					<Controls />
 					<div className='updatenode__controls'>

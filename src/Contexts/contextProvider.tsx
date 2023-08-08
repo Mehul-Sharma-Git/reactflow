@@ -23,6 +23,8 @@ interface ContextProps {
 	setNodes?: any;
 	edges?: any;
 	setEdges?: any;
+	dragOverParentNode?: any;
+	setDragOverParentNode?: any;
 }
 const StateContext = createContext<ContextProps>({});
 
@@ -81,6 +83,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	const [tree, setTree] = useState<any>(initialTree);
 	const [nodes, setNodes] = useState<CustomNode[]>(initialNodes);
 	const [edges, setEdges] = useState<Edge[]>([]);
+	const [dragOverParentNode, setDragOverParentNode] = useState(false);
 	return (
 		<StateContext.Provider
 			value={{
@@ -92,6 +95,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				setNodes,
 				edges,
 				setEdges,
+				dragOverParentNode,
+				setDragOverParentNode,
 			}}>
 			{children}
 		</StateContext.Provider>

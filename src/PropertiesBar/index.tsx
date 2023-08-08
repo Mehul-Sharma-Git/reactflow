@@ -35,7 +35,7 @@ const PropertiesBar = () => {
 		},
 		[selectedNode]
 	);
-	console.log(selectedNode);
+	// console.log(selectedNode);
 	return selectedNode ? (
 		<aside className={`${selectedNode.selected ? '' : 'sliding-bar'}`}>
 			<div className='description'>{`Change the properties of the ${selectedNode.type} node`}</div>
