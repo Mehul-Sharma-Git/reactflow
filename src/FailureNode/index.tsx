@@ -1,23 +1,23 @@
 import { Handle, Position, useNodeId, useReactFlow } from 'reactflow';
 
 import './index.css';
-import { useStateContext } from '../Contexts/contextProvider';
-import { useEffect, useState } from 'react';
+// import { useStateContext } from '../Contexts/contextProvider';
+// import { useEffect, useState } from 'react';
 import { ImCross } from 'react-icons/im';
 
 function FailureNode({ data, isConnectable, selected }: any) {
 	// console.log(selected)
-	const reactFlowInstance = useReactFlow();
-	// console.log(currentNode)
-	const [sn, setSn] = useState<any>();
-	const { selectedNode, setSelectedNode } = useStateContext();
-	const nodeId = useNodeId();
-	useEffect(() => {
-		if (nodeId && selected) {
-			setSelectedNode(reactFlowInstance.getNode(nodeId));
-		}
-		return () => {};
-	}, [selected, nodeId]);
+	// const reactFlowInstance = useReactFlow();
+	// // console.log(currentNode)
+	// const [sn, setSn] = useState<any>();
+	// const { selectedNode, setSelectedNode } = useStateContext();
+	// const nodeId = useNodeId();
+	// useEffect(() => {
+	// 	if (nodeId && selected) {
+	// 		setSelectedNode(reactFlowInstance.getNode(nodeId));
+	// 	}
+	// 	return () => {};
+	// }, [selected, nodeId]);
 
 	const handleStyle = {
 		backgroundColor: 'red',

@@ -7,17 +7,17 @@ import { TiTick } from 'react-icons/ti';
 
 function SuccessNode({ data, isConnectable, selected }: any) {
 	// console.log(selected)
-	const reactFlowInstance = useReactFlow();
-	// console.log(currentNode)
-	const [sn, setSn] = useState<any>();
-	const { selectedNode, setSelectedNode } = useStateContext();
-	const nodeId = useNodeId();
-	useEffect(() => {
-		if (nodeId && selected) {
-			setSelectedNode(reactFlowInstance.getNode(nodeId));
-		}
-		return () => {};
-	}, [selected, nodeId]);
+	// const reactFlowInstance = useReactFlow();
+	// // console.log(currentNode)
+	// const [sn, setSn] = useState<any>();
+	// const { selectedNode, setSelectedNode } = useStateContext();
+	// const nodeId = useNodeId();
+	// useEffect(() => {
+	// 	if (nodeId && selected) {
+	// 		setSelectedNode(reactFlowInstance.getNode(nodeId));
+	// 	}
+	// 	return () => {};
+	// }, [selected, nodeId]);
 
 	const handleStyle = {
 		backgroundColor: 'red',
