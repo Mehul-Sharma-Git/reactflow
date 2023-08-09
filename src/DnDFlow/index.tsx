@@ -13,6 +13,7 @@ import ReactFlow, {
 	applyEdgeChanges,
 	Node,
 	Edge,
+	BezierEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -21,9 +22,9 @@ import Sidebar from '../Sidebar';
 import './index.css';
 
 import TextUpdaterNode from '../DecisionNode';
-import CustomNode from '../EasyConnectNode';
-import FloatingEdge from '../EasyConnectNode/floatingEdge';
-import EasyConnectLine from '../CustomConnectionLine/easyConnectLine';
+// import CustomNode from '../EasyConnectNode';
+// import FloatingEdge from '../EasyConnectNode/floatingEdge';
+// import EasyConnectLine from '../CustomConnectionLine/easyConnectLine';
 
 import ConnectionLine from '../CustomConnectionLine/dottedAnimated';
 
@@ -47,7 +48,7 @@ const flowKey = 'example-flow';
 
 const nodeTypes = {
 	decision: DecisionNode,
-	custom: CustomNode,
+	// custom: CustomNode,
 	parentGroup: SubFlowNode,
 	property: PropertyNode,
 	initial: InitialNode,
@@ -56,9 +57,8 @@ const nodeTypes = {
 };
 
 // const edgeTypes = {
-//     floating: FloatingEdge,
-//     editable:EditableEdgeLine,
-
+// 	floating: FloatingEdge,
+// 	editable: EditableEdgeLine,
 // };
 
 const defaultEdgeOptions = {
@@ -70,11 +70,10 @@ const defaultEdgeOptions = {
 	},
 };
 
-// const connectionLineStyle = {
-//     strokeWidth: 3,
-//     stroke: 'black',
-// };
-
+const connectionLineStyle = {
+	strokeWidth: 1,
+	stroke: '#30b3ff',
+};
 const CustomNodeToTreeNode = (node: CustomNode) => {
 	return {
 		id: node.id,
@@ -565,7 +564,7 @@ const DnDFlow = () => {
 					onNodesChange={onNodesChange}
 					onEdgesChange={onEdgesChange}
 					onConnect={onConnect}
-					connectionLineComponent={EasyConnectLine}
+					// connectionLineComponent={EasyConnectLine}
 					onInit={setreactFlowInstanceState}
 					onDrop={onDrop}
 					onDragOver={onDragOver}
@@ -573,10 +572,11 @@ const DnDFlow = () => {
 					style={{ background: bgColor }}
 					nodeTypes={nodeTypes}
 					// edgeTypes={edgeTypes}
-					className='react-flow-subflows-example'
+					// className='react-flow-subflows-example'
 					defaultEdgeOptions={defaultEdgeOptions}
 					// connectionLineComponent={CustomConnectionLine}
 					// connectionLineStyle={connectionLineStyle}
+					// connectionLineType='step'
 					onEdgeUpdate={onEdgeUpdate}
 					onEdgeUpdateStart={onEdgeUpdateStart}
 					onEdgeUpdateEnd={onEdgeUpdateEnd}
