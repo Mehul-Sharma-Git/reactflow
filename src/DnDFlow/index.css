@@ -147,3 +147,8 @@ div.customHandle {
 .intersection-flow .react-flow__handle {
     display: none;
 }
+
+.custom-handle{
+		background-color: white;
+		border: 1px solid #30b3ff;
+}

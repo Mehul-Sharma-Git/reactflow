@@ -1,0 +1,48 @@
+.decision-node {
+    height: 50px;
+    border: 1px solid #eee;
+    padding: 5px;
+    border-radius: 5px;
+    background: white;
+    width: 100px;
+    border: 1px solid black;
+  }
+  
+  .decision-node label {
+    display: block;
+    color: #777;
+    font-size: 12px;
+  }
+  
+  .decision-handle-selected{
+    background-color: white;
+		top: 10;
+    border: 1px solid red;
+
+
+  }
+
+  .decision-handle{
+    background-color: white;
+		top: 10;
+    border: 1px solid black;
+  }
+
+  .decision-content-handle-true::before{
+    content: 'True';
+    position: relative;
+    top: -12px;
+    left: -24px;
+    font-size: 10px;
+    color: #30b3ff;
+  }
+
+  .decision-content-handle-false::before{
+    content: 'False';
+    position: relative;
+    top: 0;
+    top: -12px;
+    left: -28px;
+    font-size: 10px;
+    color: #30b3ff;
+  }

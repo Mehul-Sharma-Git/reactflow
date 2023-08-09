@@ -20,7 +20,7 @@ import Sidebar from '../Sidebar';
 
 import './index.css';
 
-import TextUpdaterNode from '../TextUpdaterNode';
+import TextUpdaterNode from '../DecisionNode';
 import CustomNode from '../EasyConnectNode';
 import FloatingEdge from '../EasyConnectNode/floatingEdge';
 import EasyConnectLine from '../CustomConnectionLine/easyConnectLine';
@@ -34,42 +34,25 @@ import PropertiesBar from '../PropertiesBar';
 import PropertyNode from '../PropertyNode';
 import { useStateContext } from '../Contexts/contextProvider';
 import checkParentNodeDrop from '../CheckParentNodeDrop';
+import InitialNode from '../InitialNode';
+import SuccessNode from '../SuccessNode';
+import FailureNode from '../FailureNode';
+import DecisionNode from '../DecisionNode';
 
 type CustomNode = Node & {
 	output?: any;
 };
 
-const initialNodes: CustomNode[] = [
-	{
-		id: 'initialNode',
-		type: 'input',
-		data: { label: 'initial node' },
-
-		position: { x: 250, y: -300 },
-	},
-	{
-		id: 'SuccessFinalNode',
-		type: 'output',
-		data: { label: 'success node' },
-
-		position: { x: 100, y: 300 },
-	},
-	{
-		id: 'FailureFinalNode',
-		type: 'output',
-		data: { label: 'failure node' },
-
-		position: { x: 400, y: 300 },
-	},
-];
-
 const flowKey = 'example-flow';
 
 const nodeTypes = {
-	textUpdater: TextUpdaterNode,
+	decision: DecisionNode,
 	custom: CustomNode,
 	parentGroup: SubFlowNode,
 	property: PropertyNode,
+	initial: InitialNode,
+	finalPositive: SuccessNode,
+	finalNegative: FailureNode,
 };
 
 // const edgeTypes = {
@@ -78,14 +61,14 @@ const nodeTypes = {
 
 // };
 
-// const defaultEdgeOptions = {
-//     style: { strokeWidth: 3, stroke: 'black' },
-//     type: 'floating',
-//     markerEnd: {
-//         type: MarkerType.ArrowClosed,
-//         color: 'black',
-//     },
-// };
+const defaultEdgeOptions = {
+	style: { strokeWidth: 1, stroke: '#30b3ff' },
+	type: 'floating',
+	markerEnd: {
+		type: MarkerType.ArrowClosed,
+		color: '#30b3ff',
+	},
+};
 
 // const connectionLineStyle = {
 //     strokeWidth: 3,
@@ -570,7 +553,7 @@ const DnDFlow = () => {
 			fileType: 'text/json',
 		});
 	};
-	const bgColor = '#F3F3F3';
+	const bgColor = '#F5F5F5';
 	// console.log(nodes);
 	return (
 		<div className='dndflow'>
@@ -591,7 +574,7 @@ const DnDFlow = () => {
 					nodeTypes={nodeTypes}
 					// edgeTypes={edgeTypes}
 					className='react-flow-subflows-example'
-					// defaultEdgeOptions={defaultEdgeOptions}
+					defaultEdgeOptions={defaultEdgeOptions}
 					// connectionLineComponent={CustomConnectionLine}
 					// connectionLineStyle={connectionLineStyle}
 					onEdgeUpdate={onEdgeUpdate}

@@ -88,7 +88,7 @@ const GetNewNode = (
 				},
 			};
 			break;
-		case 'textUpdater':
+		case 'decision':
 			newNode = {
 				id: uuidv4(),
 				type,

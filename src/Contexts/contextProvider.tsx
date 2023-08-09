@@ -57,21 +57,23 @@ type CustomNode = Node & {
 const initialNodes: CustomNode[] = [
 	{
 		id: 'initialNode',
-		type: 'input',
+		type: 'initial',
 		data: { label: 'initial node' },
+		// className: 'initial-node',
+		position: { x: -150, y: 0 },
 
-		position: { x: 250, y: -300 },
+		// style: { width: '0px', height: '0px' },
 	},
 	{
 		id: 'SuccessFinalNode',
-		type: 'output',
+		type: 'finalPositive',
 		data: { label: 'success node' },
 
-		position: { x: 100, y: 300 },
+		position: { x: 400, y: -100 },
 	},
 	{
 		id: 'FailureFinalNode',
-		type: 'output',
+		type: 'finalNegative',
 		data: { label: 'failure node' },
 
 		position: { x: 400, y: 300 },

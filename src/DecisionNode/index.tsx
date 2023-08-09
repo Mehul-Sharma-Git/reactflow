@@ -61,20 +61,22 @@ function TextUpdaterNode({ data, isConnectable, selected }: any) {
 
 	const handleLeftStyle = {
 		backgroundColor: 'red',
-		top: 10,
+		top: '8px',
 	};
 	const handleBackgroundStyle = {
 		backgroundColor: 'red',
 	};
-	const handleStyle = { top: 10 };
+	const handleTopStyle = { top: 20 };
+	const handleBottomStyle = { top: 40 };
 
 	const divStyle = {
-		border: '1px solid red',
+		border: '1px solid #30b3ff',
 	};
 	return (
-		<div className='text-updater-node' style={selected ? divStyle : {}}>
+		<div className='decision-node' style={selected ? divStyle : {}}>
 			<Handle
-				style={selected ? handleBackgroundStyle : {}}
+				// style={selected ? handleBackgroundStyle : {}}
+				className='custom-handle'
 				type='target'
 				position={Position.Left}
 				isConnectable={isConnectable}
@@ -89,16 +91,23 @@ function TextUpdaterNode({ data, isConnectable, selected }: any) {
 				type='source'
 				position={Position.Right}
 				id='true'
-				style={selected ? handleLeftStyle : handleStyle}
+				style={handleTopStyle}
 				isConnectable={isConnectable}
 				content='true'
+				className={`
+				decision-content-handle-true
+			custom-handle`}
 			/>
 			<Handle
-				style={selected ? handleBackgroundStyle : {}}
+				// style={selected ? handleBackgroundStyle : {}}
 				type='source'
 				position={Position.Right}
 				id='false'
+				style={handleBottomStyle}
 				isConnectable={isConnectable}
+				className={`
+				decision-content-handle-false
+				custom-handle`}
 			/>
 		</div>
 	);

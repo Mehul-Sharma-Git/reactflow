@@ -31,9 +31,9 @@ export default () => {
 			</div>
 			<div
 				className='dndnode custom'
-				onDragStart={(event) => onDragStart(event, 'textUpdater')}
+				onDragStart={(event) => onDragStart(event, 'decision')}
 				draggable>
-				TextUpdater Node
+				Decision Node
 			</div>
 			<div
 				className='dndnode custom'

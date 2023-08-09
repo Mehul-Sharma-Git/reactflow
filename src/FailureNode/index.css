@@ -1,0 +1,14 @@
+.final-negative-node {
+  height: 40px;
+  padding: 5px;
+  background-color: #bb2124;
+  /* color: #30b3ff; */
+  width: 40px;
+  border-radius: 50%;
+}
+  .text-updater-node label {
+    display: block;
+    color: #777;
+    font-size: 12px;
+  }
+  
